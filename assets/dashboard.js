@@ -123,13 +123,19 @@ function renderRestaurants() {
 function renderChart(data) {
   const chart = $('hourly-chart'); chart.replaceChildren();
   const golden = data.goldenTime?.recommended ? data.goldenTime.hours : [];
+  const scores = data.hourly.map(hour => hour.score).filter(Number.isFinite);
+  const upper = Math.min(100, Math.max(20, Math.ceil(Math.max(...scores, 0) / 10) * 10));
+  const lower = Math.max(0, Math.min(upper - 20, Math.floor(Math.min(...scores, 100) / 10) * 10 - 10));
+  setText('chart-scale',`높이 기준 ${lower}–${upper}점`);
+  chart.setAttribute('aria-label',`16시부터 22시까지 야장지수, 막대 높이 기준 ${lower}점부터 ${upper}점`);
   data.hourly.forEach(hour => {
     const button = document.createElement('button'); button.type='button'; button.className=`hour-button${golden.includes(hour.time) ? ' golden' : ''}`;
     button.setAttribute('aria-label',`${hour.time} ${hour.score}점, 기온 ${hour.temp}, 강수확률 ${hour.rain}`);
     button.setAttribute('aria-pressed','false');
     const track=document.createElement('span'); track.className='bar-track';
     const value=document.createElement('span'); value.className='hour-value'; value.textContent=hour.score;
-    const bar=document.createElement('span'); bar.className='hour-bar'; bar.style.height=`${Math.max(3,Math.min(100,hour.score))}%`;
+    const bar=document.createElement('span'); bar.className='hour-bar';
+    bar.style.height=`${Math.max(0,Math.min(100,(hour.score-lower)/(upper-lower)*100))}%`;
     track.append(value,bar);
     const label=document.createElement('span'); label.className='hour-label'; label.textContent=Number(hour.time.slice(0,2))+'시';
     button.append(track,label);

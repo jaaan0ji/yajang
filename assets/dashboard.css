@@ -76,10 +76,12 @@ h2 { font-size: 21px; line-height: 1.4; letter-spacing: -.7px; font-weight: 700;
 .weather-stat small { font-size: 10px; color: var(--muted); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .subtle { color: var(--muted); font-size: 12px; line-height: 1.7; }
-.chart-legend { display: flex; gap: 16px; margin-top: 13px; font-size: 10px; color: var(--muted); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 13px; font-size: 10px; color: var(--muted); }
 .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .chart-legend span::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--sand); }
 .chart-legend .legend-golden::before { background: var(--orange); }
+.chart-legend .chart-scale { margin-left: auto; font-variant-numeric: tabular-nums; }
+.chart-legend .chart-scale::before { display: none; }
 .hourly-chart { height: 186px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 20px; margin-top: 23px; }
 .hour-button { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; min-width: 0; background: none; padding: 0; border: 0; color: var(--ink); }
 .bar-track { height: 153px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; }
