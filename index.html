@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>야장하기 좋은 날</title>
+    <link rel="stylesheet" href="/vendor/leaflet.css">
+    <link rel="stylesheet" href="/assets/dashboard.css">
+    <script src="/vendor/leaflet.js" defer></script>
+    <script src="/assets/dashboard.js" defer></script>
+</head>
+<body>
+
+    <a class="skip-link" href="#dashboard">본문으로 건너뛰기</a>
+    <div class="app-shell">
+    <header class="site-header">
+        <a href="#dashboard" class="wordmark" aria-label="야장 홈">YA<span>JANG.</span></a>
+        <nav class="desktop-nav" aria-label="주 메뉴">
+            <a href="#dashboard" class="active">대시보드</a><a href="#spots">야장지도</a><a href="#forecast">주간예보</a><a href="#recommendations">추천</a>
+        </nav>
+        <label class="region-picker"><span aria-hidden="true">📍</span><span class="sr-only">지역 선택</span>
+            <select id="region-select" aria-label="지역 선택">
+                <option value="seoul_all">서울 전체</option><option value="seoul_mapo">마포구</option><option value="seoul_yongsan">용산구</option><option value="seoul_jongno">종로구</option>
+            </select>
+        </label>
+    </header>
+    <main id="dashboard" aria-busy="true">
+        <section class="mobile-intro"><p id="season-label">AUTUMN OUTDOOR GUIDE</p><h1>오늘, 야장하기 좋은 날일까요? <span aria-hidden="true">🍂</span></h1></section>
+        <div class="status-line"><span id="data-mode" class="data-badge" role="status" aria-live="polite">불러오는 중</span><span id="last-updated">데이터를 확인하고 있습니다</span><button id="refresh-button" type="button" aria-label="데이터 새로고침">↻ <span>새로고침</span></button></div>
+        <div class="dashboard-grid">
+            <section class="hero-card" aria-labelledby="hero-title">
+                <div class="hero-copy"><p class="hero-eyebrow"><span class="desktop-only">TODAY’S YAJANG</span><span class="mobile-only">오늘의 야장지수</span></p>
+                <h1 id="hero-title">오늘은<br>야장하기 좋은 날!</h1>
+                <p id="golden-summary" class="hero-summary">추천 시간대를 확인하고 있습니다</p></div>
+                <div class="score-ring" id="score-ring"><div><span id="score-val">—</span><span class="score-unit">점</span></div><span id="score-badge">확인 중</span></div>
+                <svg class="sunset-icon" viewBox="0 0 90 90" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M45 10v25m-12-12 12 12 12-12M22 65a23 23 0 0 1 46 0M13 73h64M15 57H7m76 0h-8M22 41l-6-6m52 6 6-6"/></svg>
+                <p class="hero-note" id="score-source">16–22시 평균 참고 지수</p>
+            </section>
+            <section class="weather-card" aria-labelledby="weather-title">
+                <h2 id="weather-title">오늘의 날씨</h2>
+                <div class="weather-grid">
+                    <div class="weather-stat"><span class="stat-label"><span aria-hidden="true">🌡️</span> 기온</span><strong id="current-temp">—</strong><small id="temp-mode">현재 관측</small></div>
+                    <div class="weather-stat"><span class="stat-label"><span aria-hidden="true">🌬️</span> 바람</span><strong id="current-wind">—</strong><small id="wind-mode">현재 관측</small></div>
+                    <div class="weather-stat"><span class="stat-label"><span aria-hidden="true">☔</span> 강수확률</span><strong id="current-rain">—</strong><small id="rain-mode">16–22시 최대</small></div>
+                    <div class="weather-stat"><span class="stat-label"><span aria-hidden="true">💧</span> 습도</span><strong id="current-humidity">—</strong><small id="humidity-mode">현재 관측</small></div>
+                </div>
+            </section>
+            <section class="hourly-card" aria-labelledby="hourly-title">
+                <div class="section-heading"><h2 id="hourly-title"><span class="mobile-only" aria-hidden="true">✨ </span><span class="desktop-only">시간대별 야장지수</span><span class="mobile-only">오늘의 골든타임</span></h2><span id="hourly-date" class="subtle"></span></div>
+                <div id="hourly-chart" class="hourly-chart" aria-label="16시부터 22시까지 야장지수"></div>
+                <p id="hour-detail" class="chart-detail" aria-live="polite">막대를 선택하시면 시간별 날씨를 확인할 수 있어요.</p>
+            </section>
+            <section id="forecast" class="weekly-card" aria-labelledby="weekly-title">
+                <h2 id="weekly-title">주간 야장 예보</h2>
+                <div id="weekly-days" class="weekly-days"></div>
+                <div class="best-day"><span id="best-day-title">예보를 확인하고 있어요</span><span aria-hidden="true">☀️</span></div>
+                <p id="best-day-desc" class="subtle"></p>
+                <p id="weekly-source" class="fine-print">제공된 예보 기간의 기온·강수 기준입니다.</p>
+            </section>
+            <section id="spots" class="map-card" aria-labelledby="map-title">
+                <div class="section-heading"><h2 id="map-title">📍 야장 스폿 지도</h2><span id="map-count" class="subtle"></span></div>
+                <div class="category-filters" role="group" aria-label="음식점 업종 필터">
+                    <button type="button" data-category="all" aria-pressed="true">전체</button><button type="button" data-category="restaurant" aria-pressed="false">🍽️ 음식점</button><button type="button" data-category="cafe" aria-pressed="false">☕ 카페·휴게</button><button type="button" data-category="pub" aria-pressed="false">🍺 주점</button>
+                </div>
+                <div class="map-wrap"><div id="spot-map" aria-label="음식점 위치 지도"></div><p id="map-empty" class="map-empty" hidden></p></div>
+                <p id="map-message" class="fine-print" role="status"></p>
+            </section>
+            <section id="recommendations" class="restaurant-card" aria-labelledby="restaurants-title">
+                <div class="section-heading"><h2 id="restaurants-title">오늘의 스폿</h2><span id="restaurant-mode" class="license-badge">인허가 정보</span></div>
+                <p id="recommendation-summary" class="subtle">마음에 드는 곳을 지도에서 확인해 보세요.</p>
+                <div class="restaurant-list"><table><thead class="sr-only"><tr><th>상호</th><th>업종</th><th>주소</th><th>영업 상태</th><th>위치 보기</th></tr></thead><tbody id="restaurant-table-body"></tbody></table></div>
+                <p id="restaurant-source" class="fine-print">인허가상 영업 상태입니다. 실시간 개점 여부와는 다를 수 있습니다.</p>
+            </section>
+        </div>
+        <aside class="air-strip"><span aria-hidden="true">🍃</span><span id="current-air">대기질을 확인하고 있어요</span></aside>
+        <details class="source-details"><summary>데이터 출처와 기준 보기 <span id="source-warning"></span></summary>
+            <p id="source-status"></p><p id="region-note"></p><p id="score-desc"></p><div id="source-list"></div>
+            <p>공식 기관의 지수가 아닌 자체 참고 점수입니다. 기온 40점 + 강수 40점 + 대기 20점으로 계산합니다. 주간 비교는 16–22시 기온·강수 점수를 100점으로 환산합니다.</p>
+        </details>
+    </main>
+    <footer class="site-footer"><span class="wordmark">YA<span>JANG.</span></span><p>오늘의 저녁을, 바깥에서.</p><span>기상청 · 에어코리아 · 행정안전부</span></footer>
+    </div>
+    <nav class="mobile-nav" aria-label="모바일 메뉴">
+        <a href="#dashboard" class="active"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-7v-7h-4v7H3Z"/></svg>홈</a>
+        <a href="#spots"><svg viewBox="0 0 24 24"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/></svg>지도</a>
+        <a href="#forecast"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 11h18"/></svg>예보</a>
+        <a href="#recommendations"><svg viewBox="0 0 24 24"><path d="M12 21S2 15 2 8a5 5 0 0 1 10-1A5 5 0 0 1 22 8c0 7-10 13-10 13Z"/></svg>추천</a>
+    </nav>
+
+    <script>
+        /**
+         * =========================================================================
+         * [DATA FETCHING LAYER]
+         * 모든 API 호출 및 샘플 데이터 반환 로직이 집중되는 곳입니다.
+         * 인증키는 로컬 서버에서만 사용하며, 화면에는 정규화된 응답을 전달합니다.
+         * =========================================================================
+         */
+        const DataService = {
+            async fetchDashboardData(regionCode) {
+                const response = await fetch(`/api/dashboard?region=${encodeURIComponent(regionCode)}`, {
+                    signal: AbortSignal.timeout(50000), cache: 'no-store'
+                });
+                if (!response.ok) throw new Error('서버 연결에 실패했습니다.');
+                const data = await response.json();
+                if (data.regionCode !== regionCode || !Array.isArray(data.hourly) || data.hourly.length !== 7 ||
+                    !Array.isArray(data.restaurants) || !Array.isArray(data.weekly) || !data.sources || !data.bestDay ||
+                    !Number.isFinite(data.score)) throw new Error('응답 형식을 확인하지 못했습니다.');
+                return data;
+            }
+        };
+
+        // 응답 예시 및 샘플 데이터베이스 저장소
+        const MOCK_DATABASE = {
+            'seoul_all': {
+                regionName: '서울특별시 전체 (종합)',
+                lastUpdated: '2026-10-16 17:00',
+                score: 87,
+                badge: '서울 전체 야장 최적! 🍻',
+                desc: "서울 주요 지역 대부분 맑고 온화한 기온을 유지하고 있습니다. 저녁 시간대 야외 테라스 활동에 완벽한 날씨입니다.",
+                currentTemp: '21°C',
+                humidity: '43%',
+                pmStatus: '좋음 (20㎍/㎥)',
+                hourly: [
+                    { time: '18:00', score: 85, label: '쾌적함', temp: '21°C', rain: '0%' },
+                    { time: '19:00', score: 90, label: '최적', temp: '20°C', rain: '0%' },
+                    { time: '20:00', score: 88, label: '상쾌함', temp: '19°C', rain: '0%' },
+                    { time: '21:00', score: 83, label: '선선함', temp: '18°C', rain: '0%' },
+                    { time: '22:00', score: 76, label: '외투필요', temp: '17°C', rain: '0%' }
+                ],
+                bestDay: {
+                    day: '금요일 (내일)',
+                    desc: '서울 주요 구 평균 기온 22°C / 강수확률 0% / 미세먼지 매우 청정'
+                },
+                restaurants: [
+                    { name: '종로3가 노상포차거리', type: '휴게음식점', address: '서울특별시 종로구 돈화문로 11', feature: '정통 야장 골목 분위기' },
+                    { name: '연남테라스가든', type: '일반음식점', address: '서울특별시 마포구 동교로 227-1', feature: '루프탑 테라스 및 넓은 야외 파라솔 좌석 보유' },
+                    { name: '용리단길 테라스그릴', type: '일반음식점', address: '서울특별시 용산구 한강대로40길 24', feature: '유럽풍 노상 테라스 감성' },
+                    { name: '익선동 한옥마당', type: '일반음식점', address: '서울특별시 종로구 수표로28길 21-3', feature: '고즈넉한 한옥 마당 야외 테이블' }
+                ]
+            },
+            'seoul_mapo': {
+                regionName: '서울특별시 마포구',
+                lastUpdated: '2026-10-16 17:00',
+                score: 88,
+                badge: '야장 강력 추천! 🍻',
+                desc: "기온이 선선하고 미세먼지가 '좋음' 상태입니다. 완벽한 야외 테라스 저녁을 즐기기 최고의 날씨입니다!",
+                currentTemp: '21°C',
+                humidity: '45%',
+                pmStatus: '좋음 (18㎍/㎥)',
+                hourly: [
+                    { time: '18:00', score: 85, label: '선선함', temp: '21°C', rain: '0%' },
+                    { time: '19:00', score: 90, label: '최적', temp: '20°C', rain: '0%' },
+                    { time: '20:00', score: 88, label: '쾌적함', temp: '19°C', rain: '0%' },
+                    { time: '21:00', score: 82, label: '약간쌀쌀', temp: '18°C', rain: '0%' },
+                    { time: '22:00', score: 75, label: '외투필요', temp: '17°C', rain: '0%' }
+                ],
+                bestDay: {
+                    day: '금요일 (내일)',
+                    desc: '기온 22°C / 강수확률 0% / 미세먼지 최고 청정'
+                },
+                restaurants: [
+                    { name: '연남테라스가든', type: '일반음식점', address: '서울특별시 마포구 동교로 227-1', feature: '루프탑 테라스 및 넓은 야외 파라솔 좌석 보유' },
+                    { name: '경의선숲길 포차거리', type: '휴게음식점', address: '서울특별시 마포구 와우산로38길 19', feature: '나무 그늘 아래 낭만적인 야외 인도 테이블 운영' },
+                    { name: '합정 가든브루원', type: '일반음식점', address: '서울특별시 마포구 독막로 7길 45', feature: '프라이빗 마당형 가든 야외 테이블 완비' }
+                ]
+            },
+            'seoul_yongsan': {
+                regionName: '서울특별시 용산구',
+                lastUpdated: '2026-10-16 17:00',
+                score: 82,
+                badge: '야장 즐기기 좋은 날 ✨',
+                desc: "바람이 살짝 불지만 야외 테라스에서 맥주 한 잔 하기 좋은 쾌적한 저녁입니다.",
+                currentTemp: '20°C',
+                humidity: '50%',
+                pmStatus: '보통 (32㎍/㎥)',
+                hourly: [
+                    { time: '18:00', score: 80, label: '양호', temp: '20°C', rain: '0%' },
+                    { time: '19:00', score: 85, label: '좋음', temp: '19°C', rain: '0%' },
+                    { time: '20:00', score: 82, label: '쾌적함', temp: '18°C', rain: '0%' },
+                    { time: '21:00', score: 78, label: '선선함', temp: '17°C', rain: '0%' },
+                    { time: '22:00', score: 70, label: '쌀쌀함', temp: '16°C', rain: '0%' }
+                ],
+                bestDay: {
+                    day: '토요일',
+                    desc: '낮 기온 23°C / 맑음 / 야외 활동 최적'
+                },
+                restaurants: [
+                    { name: '용리단길 테라스그릴', type: '일반음식점', address: '서울특별시 용산구 한강대로40길 24', feature: '유럽풍 노상 테라스 감성' },
+                    { name: '이태원 가든스테이지', type: '휴게음식점', address: '서울특별시 용산구 녹사평대로 174', feature: '탁 트인 전망의 루프탑 야장' }
+                ]
+            },
+            'seoul_jongno': {
+                regionName: '서울특별시 종로구',
+                lastUpdated: '2026-10-16 17:00',
+                score: 92,
+                badge: '역대급 야장 찬스! 🔥',
+                desc: "종로3가 노상 거리 감성을 즐기기에 이보다 더 좋을 수 없는 날씨입니다.",
+                currentTemp: '22°C',
+                humidity: '40%',
+                pmStatus: '좋음 (12㎍/㎥)',
+                hourly: [
+                    { time: '18:00', score: 90, label: '완벽', temp: '22°C', rain: '0%' },
+                    { time: '19:00', score: 95, label: '최고', temp: '21°C', rain: '0%' },
+                    { time: '20:00', score: 92, label: '환상적', temp: '20°C', rain: '0%' },
+                    { time: '21:00', score: 88, label: '선선함', temp: '19°C', rain: '0%' },
+                    { time: '22:00', score: 80, label: '쾌적함', temp: '18°C', rain: '0%' }
+                ],
+                bestDay: {
+                    day: '금요일 (내일)',
+                    desc: '기온 23°C / 강수확률 0% / 미세먼지 최상'
+                },
+                restaurants: [
+                    { name: '익선동 한옥마당', type: '일반음식점', address: '서울특별시 종로구 수표로28길 21-3', feature: '고즈넉한 한옥 마당 야외 테이블' },
+                    { name: '종로3가 노상포차거리', type: '휴게음식점', address: '서울특별시 종로구 돈화문로 11', feature: '정통 야장 골목 분위기' }
+                ]
+            }
+        };
+
+    </script>
+</body>
+</html>
