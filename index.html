@@ -25,12 +25,12 @@
         </label>
     </header>
     <main id="dashboard" aria-busy="true">
-        <section class="mobile-intro"><p id="season-label">AUTUMN OUTDOOR GUIDE</p><h1>오늘, 야장하기 좋은 날일까요? <span aria-hidden="true">🍂</span></h1></section>
+        <section class="mobile-intro"><div><p id="season-label">가을 저녁을 준비해 보세요</p><h1>야장하기 좋은 날</h1></div><p class="intro-description">오늘 저녁, 바깥에 앉아도 좋을까요?<br>날씨부터 주변 식당까지 확인해 보세요.</p></section>
         <div class="status-line"><span id="data-mode" class="data-badge" role="status" aria-live="polite">불러오는 중</span><span id="last-updated">데이터를 확인하고 있습니다</span><button id="refresh-button" type="button" aria-label="데이터 새로고침">↻ <span>새로고침</span></button></div>
         <div class="dashboard-grid">
             <section class="hero-card" aria-labelledby="hero-title">
-                <div class="hero-copy"><p class="hero-eyebrow"><span class="desktop-only">TODAY’S YAJANG</span><span class="mobile-only">오늘의 야장지수</span></p>
-                <h1 id="hero-title">오늘은<br>야장하기 좋은 날!</h1>
+                <div class="hero-copy"><p class="hero-eyebrow">오늘의 야장 지수</p>
+                <h2 id="hero-title">오늘 저녁 날씨를<br>확인하고 있어요</h2>
                 <p id="golden-summary" class="hero-summary">추천 시간대를 확인하고 있습니다</p></div>
                 <div class="score-ring" id="score-ring"><div><span id="score-val">—</span><span class="score-unit">점</span></div><span id="score-badge">확인 중</span></div>
                 <svg class="sunset-icon" viewBox="0 0 90 90" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M45 10v25m-12-12 12 12 12-12M22 65a23 23 0 0 1 46 0M13 73h64M15 57H7m76 0h-8M22 41l-6-6m52 6 6-6"/></svg>
@@ -46,21 +46,22 @@
                 </div>
             </section>
             <section class="hourly-card" aria-labelledby="hourly-title">
-                <div class="section-heading"><h2 id="hourly-title"><span class="mobile-only" aria-hidden="true">✨ </span><span class="desktop-only">시간대별 야장지수</span><span class="mobile-only">오늘의 골든타임</span></h2><span id="hourly-date" class="subtle"></span></div>
+                <div class="section-heading"><h2 id="hourly-title">시간대별 야장 지수</h2><span id="hourly-date" class="subtle"></span></div>
+                <div class="chart-legend"><span class="legend-regular">시간별 지수</span><span class="legend-golden">추천 골든타임</span></div>
                 <div id="hourly-chart" class="hourly-chart" aria-label="16시부터 22시까지 야장지수"></div>
                 <p id="hour-detail" class="chart-detail" aria-live="polite">막대를 선택하시면 시간별 날씨를 확인할 수 있어요.</p>
             </section>
             <section id="forecast" class="weekly-card" aria-labelledby="weekly-title">
                 <h2 id="weekly-title">주간 야장 예보</h2>
                 <div id="weekly-days" class="weekly-days"></div>
-                <div class="best-day"><span id="best-day-title">예보를 확인하고 있어요</span><span aria-hidden="true">☀️</span></div>
+                <div class="best-day"><span id="best-day-title">예보를 확인하고 있어요</span></div>
                 <p id="best-day-desc" class="subtle"></p>
                 <p id="weekly-source" class="fine-print">제공된 예보 기간의 기온·강수 기준입니다.</p>
             </section>
             <section id="spots" class="map-card" aria-labelledby="map-title">
-                <div class="section-heading"><h2 id="map-title">📍 야장 스폿 지도</h2><span id="map-count" class="subtle"></span></div>
+                <div class="section-heading"><h2 id="map-title">주변 식당 지도</h2><span id="map-count" class="subtle"></span></div>
                 <div class="category-filters" role="group" aria-label="음식점 업종 필터">
-                    <button type="button" data-category="all" aria-pressed="true">전체</button><button type="button" data-category="restaurant" aria-pressed="false">🍽️ 음식점</button><button type="button" data-category="cafe" aria-pressed="false">☕ 카페·휴게</button><button type="button" data-category="pub" aria-pressed="false">🍺 주점</button>
+                    <button type="button" data-category="all" aria-pressed="true">전체</button><button type="button" data-category="restaurant" aria-pressed="false">음식점</button><button type="button" data-category="cafe" aria-pressed="false">카페·휴게</button><button type="button" data-category="pub" aria-pressed="false">주점</button>
                 </div>
                 <div class="map-wrap"><div id="spot-map" aria-label="음식점 위치 지도"></div><p id="map-empty" class="map-empty" hidden></p></div>
                 <p id="map-message" class="fine-print" role="status"></p>

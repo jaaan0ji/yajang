@@ -152,7 +152,7 @@ function paintDashboard(data) {
   $('score-ring').style.setProperty('--score',Math.max(0,Math.min(100,data.score)));
   const rating=data.score>=80 ? '아주 좋음' : data.score>=60 ? '보통' : '주의가 필요해요';
   setText('score-badge',rating);
-  setText('hero-title',data.score>=80 ? '오늘은\n야장하기 좋은 날!' : data.score>=60 ? '오늘은\n날씨를 살펴보세요.' : '오늘은\n실내를 추천드려요.');
+  setText('hero-title',data.scoreSample ? '오늘 저녁 예보를\n확인해 주세요' : data.score>=80 ? '오늘은 바깥에서\n저녁을 즐겨 보세요' : data.score>=60 ? '오늘은\n날씨를 살펴보세요' : '오늘은\n실내를 추천드려요');
   const golden=data.goldenTime;
   setText('golden-summary',data.scoreSample ? '샘플 데이터 · 실제 예보를 확인해 주세요' : golden?.recommended ? `${rating} · ${golden.label} 골든타임` : '쾌적한 야외 시간대를 찾지 못했어요');
   setText('score-source',data.scoreSample ? '16–22시 평균 · 샘플 데이터 포함' : '16–22시 평균 · 기온, 강수, 대기를 반영했어요');
@@ -208,6 +208,6 @@ document.querySelectorAll('.desktop-nav a,.mobile-nav a').forEach(link=>link.add
   document.querySelectorAll('.desktop-nav a,.mobile-nav a').forEach(a=>a.classList.toggle('active',a.hash===link.hash));
 }));
 const month=Number(new Intl.DateTimeFormat('en',{month:'numeric',timeZone:'Asia/Seoul'}).format(new Date()));
-setText('season-label',`${month>=3&&month<=5?'SPRING':month>=6&&month<=8?'SUMMER':month>=9&&month<=11?'AUTUMN':'WINTER'} OUTDOOR GUIDE`);
+setText('season-label',`${month>=3&&month<=5?'봄':month>=6&&month<=8?'여름':month>=9&&month<=11?'가을':'겨울'} 저녁을 준비해 보세요`);
 renderDashboard($('region-select').value);
 setInterval(()=>renderDashboard($('region-select').value),30*60*1000);

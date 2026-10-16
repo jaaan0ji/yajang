@@ -4,3 +4,4 @@ node_modules/
 .verification/
 verification/
 *.log
+.deployment/

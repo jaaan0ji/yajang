@@ -1,6 +1,25 @@
 # 야장하기 좋은 날
 
-기존 Canvas의 `index.html`에 공공데이터 API를 연결하고, 제공해 주신 PC·모바일 이미지를 반영한 로컬 대시보드입니다. Node.js 24 LTS를 사용합니다. 혼잡도 카드는 표시하지 않습니다.
+기존 Canvas의 `index.html`에 공공데이터 API를 연결하고, 제공해 주신 PC·모바일 이미지를 반영한 대시보드입니다. 로컬 실행에는 Node.js 24 LTS를 사용합니다. 혼잡도 카드는 표시하지 않습니다.
+
+## 공개 접속과 배포
+
+- 공개 주소: https://yajang-jaaan0ji.violetwood16.chatgpt.site
+- 로그인 없이 주소로 접속할 수 있으며, 로컬 PC나 터미널을 꺼도 공개 사이트는 계속 동작합니다.
+- Sites의 Cloudflare Workers 서버가 공공데이터 API를 호출합니다. `API_KEY`는 배포 서비스의 비밀 환경변수에 저장되며 HTML·브라우저 JS·GitHub에 포함하지 않습니다.
+- 인증키 미설정 또는 API 실패 시 기존과 동일하게 해당 영역에 ‘샘플 데이터’를 표시합니다. 외부 리다이렉트는 따라가지 않아 다른 서버로 키가 전달되지 않습니다.
+- GitHub 커밋만으로 사이트가 자동 배포되지는 않습니다. 소스를 동기화한 뒤 Sites에서 별도로 새 버전을 배포합니다.
+
+`deployment/`에는 배포 서버의 HTML·API 경로, 사이트 식별 정보, 동기화 도구를 보관합니다. 전체 Vinext 빌드 환경과 Sites 소스 Git 체크아웃은 `.deployment/yajang/`에 있고 GitHub 커밋에서는 제외합니다. 기존 Sites 프로젝트 ID는 `deployment/hosting.json`에 기록되어 있습니다. 후속 배포에서도 이 프로젝트를 재사용해 주세요.
+
+기존 배포 체크아웃의 화면과 데이터 로직을 갱신할 때:
+
+```powershell
+node deployment/sync-site.mjs .deployment/yajang
+node --test tests/dashboard.test.mjs
+```
+
+이후 Sites 플러그인의 빌드·소스 저장·배포 절차를 실행합니다. 최초 복원 시에는 같은 프로젝트의 Sites 소스 저장소를 열어 체크아웃을 복구해야 합니다. 인증키는 파일에 복사하거나 공개 환경변수로 등록하지 않고, 배포 서비스의 `API_KEY` 비밀 설정으로만 관리해 주세요.
 
 ## 실행과 종료
 

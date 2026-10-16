@@ -78,6 +78,22 @@ test('인증키 없는 파일과 없는 .env 모두 네트워크 호출 없이 �
     assert.match(data.warnings[0], /인증키가 없습니다/);
   }
 });
+test('배포 서버의 비밀 설정으로 데이터를 읽고 키 변경·누락 시 캐시를 갱신합니다', async () => {
+  let key = 'HOSTED_TEST_KEY';
+  let calls = 0;
+  const service = createDashboardService({ samples, configProvider: () => ({ API_KEY:key }), now,
+    fetchImpl: async url => { calls++; assert.equal(url.searchParams.get('serviceKey'),key); return fixtureFetch(url); } });
+  const live = await service('seoul_mapo');
+  assert.equal(live.mode,'live');
+  assert.ok(!JSON.stringify(live).includes(key));
+  assert.equal(calls,5);
+  key = 'ROTATED_HOSTED_TEST_KEY';
+  assert.equal((await service('seoul_mapo')).mode,'live');
+  assert.equal(calls,10);
+  key = '';
+  assert.equal((await service('seoul_mapo')).mode,'sample');
+  assert.equal(calls,10);
+});
 test('실제 응답 형식을 기존 화면 구조로 변환하고 캐시를 공유합니다', async () => {
   let calls = 0;
   const { service } = await setup(async url => { calls++; return fixtureFetch(url); });
@@ -91,6 +107,17 @@ test('실제 응답 형식을 기존 화면 구조로 변환하고 캐시를 공
   assert.equal(data.sources.restaurant.reference, '2026-10-15 22:00:00');
   await service('seoul_mapo');
   assert.equal(calls, 5);
+});
+test('API 리다이렉트를 따라가지 않고 인증키를 다른 서버로 전달하지 않습니다', async () => {
+  const { service } = await setup(async (url, options) => {
+    assert.equal(url.hostname, 'apis.data.go.kr');
+    assert.equal(options.redirect, 'manual');
+    return new Response(null, { status: 302, headers: { Location: 'https://example.com/' } });
+  });
+  const data = await service('seoul_mapo');
+  assert.equal(data.mode, 'sample');
+  assert.match(data.sources.weather.reason, /HTTP 302/);
+  assert.ok(!JSON.stringify(data).includes('TEST_KEY_NOT_A_REAL_CREDENTIAL'));
 });
 
 test('지수는 16~22시 일곱 시간 모두를 반영합니다', async () => {
